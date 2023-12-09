@@ -43,11 +43,18 @@ case $CLOUD in
     ;;
 esac
 
-if [ -z "$PUBLIC_IP" ]; then
+if [ -n "$PUBLIC_IP" ]; then
   LOCAL_IP=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
   PUBLIC_IP=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
   PRIVATE_INTERFACE="private/${LOCAL_IP}"
   PUBLIC_INTERFACE="public/${LOCAL_IP}!${PUBLIC_IP}"
+elif [ -n "$LOCAL_IP" ]; then
+  PRIVATE_INTERFACE="private/${LOCAL_IP}"
+  PUBLIC_INTERFACE="public/${LOCAL_IP}"
+else
+  LOCAL_IP=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
+  PRIVATE_INTERFACE="private/${LOCAL_IP}"
+  PUBLIC_INTERFACE="public/${LOCAL_IP}"
 fi
 
 if [ -z "$RTP_START_PORT" ]; then
@@ -61,6 +68,9 @@ if [ -z "$LOGLEVEL" ]; then
 fi
 
 echo "LOGLEVEL is $LOGLEVEL"
+echo "PUBLIC Interface is ${PUBLIC_INTERFACE}"
+echo "PRIVATE Interface is ${PRIVATE_INTERFACE}"
+
 
 if [ "$1" = 'rtpengine' ]; then
   shift
